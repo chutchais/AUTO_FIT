@@ -158,20 +158,41 @@ Public Class Form1
                     Case "CFP"
                         Select Case vProcess
                             Case "OBS" : vExeStation = "1400"
+                            Case "FVT" : vExeStation = "1600"
+                            Case "EPT" : vExeStation = "1650"
+                            Case "ESS" : vExeStation = "1700"
+                            Case "EXS" : vExeStation = "1900"
+                            Case "CFG" : vExeStation = "1950"
                         End Select
                     Case "CFP GLACIER"
                         Select Case vProcess
                             Case "OBS" : vExeStation = "1400"
+                            Case "FVT" : vExeStation = "1600"
+                            Case "EPT" : vExeStation = "1650"
+                            Case "ESS" : vExeStation = "1700"
+                            Case "EXS" : vExeStation = "1900"
+                            Case "CFG" : vExeStation = "1950"
                         End Select
 
                     Case "CFP2"
                         Select Case vProcess
                             Case "OBS" : vExeStation = "101"
+                            Case "FVT" : vExeStation = "150"
+                            Case "EPT" : vExeStation = "160"
+                            Case "ESS" : vExeStation = "170"
+                            Case "FST" : vExeStation = "180"
+                            Case "CFG" : vExeStation = "200"
                         End Select
 
                     Case "AC400"
                         Select Case vProcess
                             Case "OBS" : vExeStation = "190"
+                            Case "FVT" : vExeStation = "250"
+                            Case "EPT" : vExeStation = "260"
+                            Case "ESS" : vExeStation = "270"
+                            Case "FST" : vExeStation = "280"
+                            Case "EXS" : vExeStation = "290"
+                            Case "CFG" : vExeStation = "325"
                         End Select
                 End Select
 

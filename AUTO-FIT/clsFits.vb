@@ -502,11 +502,11 @@ Public Class clsAutoTest
         'Date format : 2016-07-01
         Dim vSql As String = "select * " & _
                             "from uut_result " & _
-                            "where process in ('DCP','DBI','FTU','FPT','FAT','OBS') " & _
+                            "where process in ('DCP','DBI','FTU','FPT','FAT','OBS','FVT','EPT','ESS','FST','EXS','CFG') " & _
                             "and id > ?  and uut_status <>'Error'" & _
                             "order by start_date_time"
         'PIC level : 'DCP','DBI','FTU','FPT','FAT'
-        'Module level : 'OBS'
+        'Module level : 'OBS','FVT','EPT','ESS','FST','EXS','CFG'
         Dim cmd As New ADODB.Command()
         Dim sDateFromParam As ADODB.Parameter
 
