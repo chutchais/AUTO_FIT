@@ -504,7 +504,8 @@ Public Class clsAutoTest
                             "from uut_result " & _
                             "where process in ('DCP','DBI','FTU','FPT','FAT','OBS','FVT','EPT','ESS','FST','EXS','CFG') " & _
                             "and id > ?  and uut_status <>'Error'" & _
-                            "order by start_date_time"
+                            "order by id"
+        'order by start_date_time
         'PIC level : 'DCP','DBI','FTU','FPT','FAT'
         'Module level : 'OBS','FVT','EPT','ESS','FST','EXS','CFG'
         Dim cmd As New ADODB.Command()
@@ -751,15 +752,18 @@ NextLoop:
         Dim vSql As String
             Dim vUutResult As String
         vUutResult = vID
-            vSql = "SELECT STEP_RESULT.UUT_RESULT, STEP_RESULT.STEP_NAME, " & _
-                "STEP_RESULT.STEP_GROUP, STEP_RESULT.STATUS, PROP_RESULT.DATA, " & _
-                "PROP_NUMERICLIMIT.HIGH_LIMIT, PROP_NUMERICLIMIT.LOW_LIMIT, " & _
-                "PROP_NUMERICLIMIT.UNITS, PROP_NUMERICLIMIT.COMP_OPERATOR,STEP_RESULT.ID,UUT_RESULT.STATION_ID " & _
-                "FROM STEP_RESULT INNER JOIN " & _
-                         "PROP_RESULT ON STEP_RESULT.ID = PROP_RESULT.STEP_RESULT INNER JOIN " & _
-                         "PROP_NUMERICLIMIT ON PROP_RESULT.ID = PROP_NUMERICLIMIT.PROP_RESULT INNER JOIN " & _
-                         "UUT_RESULT ON STEP_RESULT.UUT_RESULT = UUT_RESULT.ID " & _
-                "WHERE(STEP_RESULT.UUT_RESULT = ? and PROP_RESULT.DATA<>'0' )"
+        'Midify by Chutchai on Dec 8,2016
+        'To remove and PROP_RESULT.DATA<>'0' 
+        vSql = "SELECT STEP_RESULT.UUT_RESULT, STEP_RESULT.STEP_NAME, " & _
+            "STEP_RESULT.STEP_GROUP, STEP_RESULT.STATUS, PROP_RESULT.DATA, " & _
+            "PROP_NUMERICLIMIT.HIGH_LIMIT, PROP_NUMERICLIMIT.LOW_LIMIT, " & _
+            "PROP_NUMERICLIMIT.UNITS, PROP_NUMERICLIMIT.COMP_OPERATOR,STEP_RESULT.ID,UUT_RESULT.STATION_ID " & _
+            "FROM STEP_RESULT INNER JOIN " & _
+                     "PROP_RESULT ON STEP_RESULT.ID = PROP_RESULT.STEP_RESULT INNER JOIN " & _
+                     "PROP_NUMERICLIMIT ON PROP_RESULT.ID = PROP_NUMERICLIMIT.PROP_RESULT INNER JOIN " & _
+                     "UUT_RESULT ON STEP_RESULT.UUT_RESULT = UUT_RESULT.ID " & _
+            "WHERE(STEP_RESULT.UUT_RESULT = ? )"
+        'and PROP_RESULT.DATA<>'0' 
             Dim cmd2 As New ADODB.Command()
             Dim sUUTparam As ADODB.Parameter
             With cmd2

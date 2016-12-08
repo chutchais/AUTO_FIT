@@ -393,11 +393,21 @@ NoSN:
         Dim vRst As ADODB.Recordset
         vRst = objAutoTest.getTestData(vSn, vProcess, vID)
         vRst.Filter = "status <> 'Passed'"
+        Dim vStrResult As String
+        
         If vRst.RecordCount > 0 Then
-            Return vRst.Fields("step_name").Value & "=" & vRst.Fields("data").Value & " " & vRst.Fields("units").Value & _
-                "(" & vRst.Fields("low_limit").Value & "-" & vRst.Fields("high_limit").Value & ")"
+            vStrResult = vRst.Fields("step_name").Value & "=" & _
+                IIf(IsDBNull(vRst.Fields("data").Value), "", vRst.Fields("data").Value) & " " & _
+                IIf(IsDBNull(vRst.Fields("units").Value), "", vRst.Fields("units").Value) & _
+                "(" & _
+                IIf(IsDBNull(vRst.Fields("low_limit").Value), "", vRst.Fields("low_limit").Value) & _
+                "-" & _
+                IIf(IsDBNull(vRst.Fields("high_limit").Value), "", vRst.Fields("high_limit").Value) & _
+                ")"
+            getFailedText = vStrResult
         Else
-            Return ""
+            vStrResult = "Not found Failed record on Test data"
+            getFailedText = vStrResult
         End If
     End Function
 
@@ -530,6 +540,10 @@ NoSN:
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         'First import then using Timer.
         If btnImport.Text = "&Start Import data" Then
+            'Added by Chutchai on Dec 7,2016
+            'To verify all database connection
+            'If objFits.database .
+
             ExportData()
             Timer1.Enabled = True
             btnImport.Text = "&Stop Import data"
