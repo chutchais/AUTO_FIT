@@ -227,14 +227,26 @@ Public Class Form1
 
                 vTopBomRev = objFITSDLL.fn_Query(vModel, vExeStation, "2.9", vSn, "PART_REV", ",")
 
-                If vResult <> "Passed" Then
+                If vResult = "Terminated" Then
+                    'Keep Terminated ID
+                    'vRemark = getTerminatedText(vSn, vProcess, vUutID)
+                    'vDisposCode = "Terminated"
+                    TerminatedLog(Now() & "--" & vSn & "," & vModel & "," & vProcess & "," & vUutID)
+                    GoTo nextSN
+                End If
+
+                If vResult = "Failed" Then
                     vRemark = getFailedText(vSn, vProcess, vUutID)
                     If vRemark.Length > 0 Then
                         vDisposCode = vRemark.Split("=")(0).ToUpper
                     Else
-                        vDisposCode = "FAIL"
+                        'Terminated.
+                        vRemark = "Not Found failed record" 'getTerminatedText(vSn, vProcess, vUutID)
+                        vDisposCode = "Terminated"
                     End If
                 End If
+
+
 
 
                 Dim vTest1 As String = "FBN Serial No|Login Name|Product Code|" & _
@@ -244,7 +256,8 @@ Public Class Form1
 
                 Dim vTest2 As String = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
                                 vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
-                                vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & vRemark & "|" & vTopBomRev & "|" & _
+                                vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
+                                Mid(vRemark, 1, 150) & "|" & vTopBomRev & "|" & _
                                 vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS
                 Dim vCheckIn As String
                 Dim vCheckOut As String
@@ -401,14 +414,41 @@ NoSN:
                 IIf(IsDBNull(vRst.Fields("units").Value), "", vRst.Fields("units").Value) & _
                 "(" & _
                 IIf(IsDBNull(vRst.Fields("low_limit").Value), "", vRst.Fields("low_limit").Value) & _
-                "-" & _
+                "/" & _
                 IIf(IsDBNull(vRst.Fields("high_limit").Value), "", vRst.Fields("high_limit").Value) & _
                 ")"
             getFailedText = vStrResult
         Else
-            vStrResult = "Not found Failed record on Test data"
+            vStrResult = ""
             getFailedText = vStrResult
         End If
+    End Function
+
+
+    Function getTerminatedText(vSn As String, vProcess As String, vID As String) As String
+        Dim vRst As ADODB.Recordset
+        vRst = objAutoTest.getStepTestData(vSn, vProcess, vID)
+        vRst.Filter = "status = 'Failed'"
+        Dim vStrResult As String
+        If vRst.RecordCount = 0 Then
+            vRst.Filter = ""
+            vRst.Filter = "report_text <> ''"
+            If vRst.RecordCount = 0 Then
+                vRst.Filter = ""
+                vRst.MoveLast()
+                vStrResult = "Terminated at " & vRst.Fields("step_name").Value & vbCrLf & _
+                        "Error Message : " & IIf(IsDBNull(vRst.Fields("report_text").Value), "", vRst.Fields("report_text").Value)
+            Else
+                vStrResult = "Terminated at " & vRst.Fields("step_name").Value & vbCrLf & _
+                        "Error Message : " & IIf(IsDBNull(vRst.Fields("report_text").Value), "", vRst.Fields("report_text").Value)
+            End If
+            
+        Else
+            vRst.MoveLast()
+            vStrResult = "Terminated at " & vRst.Fields("step_name").Value & vbCrLf & _
+                        "Error Message : " & IIf(IsDBNull(vRst.Fields("report_text").Value), "", vRst.Fields("report_text").Value)
+        End If
+        Return vStrResult
     End Function
 
 
@@ -431,6 +471,12 @@ NoSN:
         file.Close()
     End Sub
 
+    Sub TerminatedLog(vMessage As String)
+        Dim file As System.IO.StreamWriter
+        file = My.Computer.FileSystem.OpenTextFileWriter(vOutPutFolder & Now().ToString("yyyy-M-dd") & "_Terminated.txt", True) '"2016-11-30.txt"
+        file.WriteLine(vMessage)
+        file.Close()
+    End Sub
 
     Function uploadData(vFile As String) As Boolean
         'HTTP variable

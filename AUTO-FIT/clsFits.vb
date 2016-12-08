@@ -775,10 +775,31 @@ NextLoop:
                 .Parameters.Append(sUUTparam)
                 getTestData = .Execute
             End With
+    End Function
 
 
+    Public Function getStepTestData(vSerialnumber As String, vProcess As String, _
+                            ByRef vID As String) As ADODB.Recordset
+        Dim vSql As String
+        Dim vUutResult As String
+        vUutResult = vID
+        'Midify by Chutchai on Dec 8,2016
 
-
+        vSql = "select * " & _
+                "from step_result " & _
+                "where UUT_RESULT=?"
+        'and PROP_RESULT.DATA<>'0' 
+        Dim cmd2 As New ADODB.Command()
+        Dim sUUTparam As ADODB.Parameter
+        With cmd2
+            .ActiveConnection = cn
+            .CommandText = vSql
+            .CommandType = CommandTypeEnum.adCmdText
+            sUUTparam = .CreateParameter("vUUTserial", DataTypeEnum.adVarChar, _
+                                                 ParameterDirectionEnum.adParamInput, 50, vUutResult)
+            .Parameters.Append(sUUTparam)
+            getStepTestData = .Execute
+        End With
     End Function
 
 
