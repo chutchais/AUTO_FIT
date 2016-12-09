@@ -241,8 +241,10 @@ Public Class Form1
                         vDisposCode = vRemark.Split("=")(0).ToUpper
                     Else
                         'Terminated.
-                        vRemark = "Not Found failed record" 'getTerminatedText(vSn, vProcess, vUutID)
-                        vDisposCode = "Terminated"
+                        TerminatedLog(Now() & "--" & vSn & "," & vModel & "," & vProcess & "," & vUutID)
+                        GoTo nextSN
+                        'vRemark = "Not Found failed record" 'getTerminatedText(vSn, vProcess, vUutID)
+                        'vDisposCode = "Terminated"
                     End If
                 End If
 
@@ -257,7 +259,7 @@ Public Class Form1
                 Dim vTest2 As String = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
                                 vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
                                 vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
-                                Mid(vRemark, 1, 150) & "|" & vTopBomRev & "|" & _
+                                Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
                                 vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS
                 Dim vCheckIn As String
                 Dim vCheckOut As String
@@ -403,25 +405,26 @@ NoSN:
     End Sub
 
     Function getFailedText(vSn As String, vProcess As String, vID As String) As String
-        Dim vRst As ADODB.Recordset
-        vRst = objAutoTest.getTestData(vSn, vProcess, vID)
-        vRst.Filter = "status <> 'Passed'"
-        Dim vStrResult As String
-        
-        If vRst.RecordCount > 0 Then
-            vStrResult = vRst.Fields("step_name").Value & "=" & _
-                IIf(IsDBNull(vRst.Fields("data").Value), "", vRst.Fields("data").Value) & " " & _
-                IIf(IsDBNull(vRst.Fields("units").Value), "", vRst.Fields("units").Value) & _
-                "(" & _
-                IIf(IsDBNull(vRst.Fields("low_limit").Value), "", vRst.Fields("low_limit").Value) & _
-                "/" & _
-                IIf(IsDBNull(vRst.Fields("high_limit").Value), "", vRst.Fields("high_limit").Value) & _
-                ")"
-            getFailedText = vStrResult
-        Else
-            vStrResult = ""
-            getFailedText = vStrResult
-        End If
+        getFailedText = objAutoTest.getTestDataString(vSn, vProcess, vID)
+        'Dim vRst As ADODB.Recordset
+        'vRst = objAutoTest.getTestData(vSn, vProcess, vID)
+        'vRst.Filter = "status <> 'Passed'"
+        'Dim vStrResult As String
+
+        'If vRst.RecordCount > 0 Then
+        '    vStrResult = vRst.Fields("step_name").Value & "=" & _
+        '        IIf(IsDBNull(vRst.Fields("data").Value), "", vRst.Fields("data").Value) & " " & _
+        '        IIf(IsDBNull(vRst.Fields("units").Value), "", vRst.Fields("units").Value) & _
+        '        "(" & _
+        '        IIf(IsDBNull(vRst.Fields("low_limit").Value), "", vRst.Fields("low_limit").Value) & _
+        '        "/" & _
+        '        IIf(IsDBNull(vRst.Fields("high_limit").Value), "", vRst.Fields("high_limit").Value) & _
+        '        ")"
+        '    getFailedText = vStrResult
+        'Else
+        '    vStrResult = ""
+        '    getFailedText = vStrResult
+        'End If
     End Function
 
 

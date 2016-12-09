@@ -752,6 +752,11 @@ NextLoop:
         Dim vSql As String
             Dim vUutResult As String
         vUutResult = vID
+
+        vSql = "select * " & _
+                "from step_result " & _
+                "where UUT_RESULT = ? " & _
+                "and status='Failed'"
         'Midify by Chutchai on Dec 8,2016
         'To remove and PROP_RESULT.DATA<>'0' 
         vSql = "SELECT STEP_RESULT.UUT_RESULT, STEP_RESULT.STEP_NAME, " & _
@@ -764,17 +769,106 @@ NextLoop:
                      "UUT_RESULT ON STEP_RESULT.UUT_RESULT = UUT_RESULT.ID " & _
             "WHERE(STEP_RESULT.UUT_RESULT = ? )"
         'and PROP_RESULT.DATA<>'0' 
-            Dim cmd2 As New ADODB.Command()
-            Dim sUUTparam As ADODB.Parameter
-            With cmd2
+        Dim cmd2 As New ADODB.Command()
+        Dim sUUTparam As ADODB.Parameter
+        With cmd2
+            .ActiveConnection = cn
+            .CommandText = vSql
+            .CommandType = CommandTypeEnum.adCmdText
+            sUUTparam = .CreateParameter("vUUTserial", DataTypeEnum.adVarChar, _
+                                                 ParameterDirectionEnum.adParamInput, 50, vUutResult)
+            .Parameters.Append(sUUTparam)
+            getTestData = .Execute
+        End With
+    End Function
+
+
+    Public Function getTestDataString(vSerialnumber As String, vProcess As String, _
+                                ByRef vID As String) As String
+        Dim vSql As String
+        Dim vUutResult As String
+        vUutResult = vID
+
+        vSql = "select * " & _
+                "from step_result " & _
+                "where UUT_RESULT = ? " & _
+                "and status='Failed'"
+        'and PROP_RESULT.DATA<>'0' 
+        Dim vRst As New ADODB.Recordset
+        Dim cmdUUTResult As New ADODB.Command()
+        Dim sUUTparam As ADODB.Parameter
+        With cmdUUTResult
+            .ActiveConnection = cn
+            .CommandText = vSql
+            .CommandType = CommandTypeEnum.adCmdText
+            sUUTparam = .CreateParameter("vUUTResult", DataTypeEnum.adVarChar, _
+                                                 ParameterDirectionEnum.adParamInput, 50, vUutResult)
+            .Parameters.Append(sUUTparam)
+            vRst = .Execute
+        End With
+
+        If vRst.RecordCount = 0 Then
+            vUutResult = "Terminated = Not found failed test record"
+        End If
+
+        vRst.MoveLast()
+        Dim vSympTom As String
+        Dim vFailDetail As String
+
+        If vRst.Fields("step_type").Value = "PassFailTest" Then
+            vSympTom = Mid(vRst.Fields("step_name").Value, 1, 50)
+            vSympTom = vSympTom.Replace("|", " ")
+            vFailDetail = IIf(IsDBNull(vRst.Fields("report_text").Value), "No error message text", vRst.Fields("report_text").Value)
+            vFailDetail = vFailDetail.Replace("|", " ")
+            vUutResult = vSympTom & "=" & Mid(vFailDetail, 1, 190)
+            getTestDataString = vUutResult
+        ElseIf vRst.Fields("step_type").Value = "NumericLimitTest" Then
+            'Midify by Chutchai on Dec 8,2016
+            'To remove and PROP_RESULT.DATA<>'0' 
+            vSql = "SELECT STEP_RESULT.UUT_RESULT, STEP_RESULT.STEP_NAME, " & _
+                "STEP_RESULT.STEP_GROUP, STEP_RESULT.STATUS, PROP_RESULT.DATA, " & _
+                "PROP_NUMERICLIMIT.HIGH_LIMIT, PROP_NUMERICLIMIT.LOW_LIMIT, " & _
+                "PROP_NUMERICLIMIT.UNITS, PROP_NUMERICLIMIT.COMP_OPERATOR,STEP_RESULT.ID,UUT_RESULT.STATION_ID " & _
+                "FROM STEP_RESULT INNER JOIN " & _
+                         "PROP_RESULT ON STEP_RESULT.ID = PROP_RESULT.STEP_RESULT INNER JOIN " & _
+                         "PROP_NUMERICLIMIT ON PROP_RESULT.ID = PROP_NUMERICLIMIT.PROP_RESULT INNER JOIN " & _
+                         "UUT_RESULT ON STEP_RESULT.UUT_RESULT = UUT_RESULT.ID " & _
+                "WHERE(STEP_RESULT.UUT_RESULT = ? )"
+            Dim vRst2 As ADODB.Recordset
+            Dim cmdUUTResult2 As New ADODB.Command()
+            Dim sUUTparam2 As ADODB.Parameter
+            With cmdUUTResult2
                 .ActiveConnection = cn
                 .CommandText = vSql
                 .CommandType = CommandTypeEnum.adCmdText
-                sUUTparam = .CreateParameter("vUUTserial", DataTypeEnum.adVarChar, _
+                sUUTparam2 = .CreateParameter("vUUTResult", DataTypeEnum.adVarChar, _
                                                      ParameterDirectionEnum.adParamInput, 50, vUutResult)
-                .Parameters.Append(sUUTparam)
-                getTestData = .Execute
+                .Parameters.Append(sUUTparam2)
+                vRst2 = .Execute
             End With
+            vRst2.Filter = "status <> 'Passed'"
+            'Dim vStrResult As String
+
+            If vRst2.RecordCount > 0 Then
+                vUutResult = vRst2.Fields("step_name").Value & "=" & _
+                    IIf(IsDBNull(vRst2.Fields("data").Value), "", vRst2.Fields("data").Value) & " " & _
+                    IIf(IsDBNull(vRst2.Fields("units").Value), "", vRst2.Fields("units").Value) & _
+                    "(" & _
+                    IIf(IsDBNull(vRst2.Fields("low_limit").Value), "", vRst2.Fields("low_limit").Value) & _
+                    "/" & _
+                    IIf(IsDBNull(vRst2.Fields("high_limit").Value), "", vRst2.Fields("high_limit").Value) & _
+                    ")"
+                getTestDataString = vUutResult
+            Else
+                vUutResult = vUutResult = vRst.Fields("step_name").Value & "=" & IIf(IsDBNull(vRst.Fields("report_text").Value), "No error message text", vRst.Fields("report_text").Value)
+                getTestDataString = vUutResult
+            End If
+        Else
+            vUutResult = vUutResult = vRst.Fields("step_name").Value & "=" & IIf(IsDBNull(vRst.Fields("report_text").Value), "No error message text", vRst.Fields("report_text").Value)
+            getTestDataString = vUutResult
+        End If
+        
+
     End Function
 
 
