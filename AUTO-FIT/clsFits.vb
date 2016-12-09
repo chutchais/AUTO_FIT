@@ -63,7 +63,11 @@ Public Class clsFits
     End Function
 
     Public Sub disconnect()
+        If cn.State = 1 Then cn.Close()
+    End Sub
 
+    Public Sub reconnect()
+        If cn.State <> 1 Then cn.Open()
     End Sub
 
     Public Function getEvents(vDateFrom As String, vDateTo As String) As ADODB.Recordset
@@ -465,8 +469,13 @@ Public Class clsAutoTest
 
     End Function
 
-    Public Sub disconnect()
 
+    Public Sub disconnect()
+        If cn.State = 1 Then cn.Close()
+    End Sub
+
+    Public Sub reconnect()
+        If cn.State <> 1 Then cn.Open()
     End Sub
 
 
@@ -860,7 +869,7 @@ NextLoop:
                     ")"
                 getTestDataString = vUutResult
             Else
-                vUutResult = vUutResult = vRst.Fields("step_name").Value & "=" & IIf(IsDBNull(vRst.Fields("report_text").Value), "No error message text", vRst.Fields("report_text").Value)
+                vUutResult = vRst.Fields("step_name").Value & "=" & IIf(IsDBNull(vRst.Fields("report_text").Value), "No error message text", vRst.Fields("report_text").Value)
                 getTestDataString = vUutResult
             End If
         Else

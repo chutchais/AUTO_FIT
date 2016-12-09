@@ -37,6 +37,8 @@ Partial Class Form1
         Me.btnImport = New System.Windows.Forms.Button()
         Me.btnExit = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.lblCurrentID = New System.Windows.Forms.Label()
+        Me.Label7 = New System.Windows.Forms.Label()
         Me.lblNextRun = New System.Windows.Forms.Label()
         Me.lblTo = New System.Windows.Forms.Label()
         Me.lblFrom = New System.Windows.Forms.Label()
@@ -45,9 +47,7 @@ Partial Class Form1
         Me.Label4 = New System.Windows.Forms.Label()
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.Timer2 = New System.Windows.Forms.Timer(Me.components)
-        Me.Button1 = New System.Windows.Forms.Button()
-        Me.Label7 = New System.Windows.Forms.Label()
-        Me.lblCurrentID = New System.Windows.Forms.Label()
+        Me.btnAuto = New System.Windows.Forms.Button()
         Me.StatusStrip1.SuspendLayout()
         Me.gbImport.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -176,7 +176,7 @@ Partial Class Form1
         '
         'btnExit
         '
-        Me.btnExit.Location = New System.Drawing.Point(499, 95)
+        Me.btnExit.Location = New System.Drawing.Point(499, 94)
         Me.btnExit.Margin = New System.Windows.Forms.Padding(4)
         Me.btnExit.Name = "btnExit"
         Me.btnExit.Size = New System.Drawing.Size(185, 39)
@@ -202,6 +202,26 @@ Partial Class Form1
         Me.GroupBox1.TabIndex = 5
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Next Run Details"
+        '
+        'lblCurrentID
+        '
+        Me.lblCurrentID.AutoSize = True
+        Me.lblCurrentID.Location = New System.Drawing.Point(336, 55)
+        Me.lblCurrentID.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.lblCurrentID.Name = "lblCurrentID"
+        Me.lblCurrentID.Size = New System.Drawing.Size(21, 17)
+        Me.lblCurrentID.TabIndex = 7
+        Me.lblCurrentID.Text = "ID"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Location = New System.Drawing.Point(248, 55)
+        Me.Label7.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(80, 17)
+        Me.Label7.TabIndex = 6
+        Me.Label7.Text = "Current ID :"
         '
         'lblNextRun
         '
@@ -270,42 +290,22 @@ Partial Class Form1
         '
         Me.Timer2.Interval = 1000
         '
-        'Button1
+        'btnAuto
         '
-        Me.Button1.Location = New System.Drawing.Point(511, 135)
-        Me.Button1.Margin = New System.Windows.Forms.Padding(4)
-        Me.Button1.Name = "Button1"
-        Me.Button1.Size = New System.Drawing.Size(52, 32)
-        Me.Button1.TabIndex = 6
-        Me.Button1.Text = "Button1"
-        Me.Button1.UseVisualStyleBackColor = True
-        '
-        'Label7
-        '
-        Me.Label7.AutoSize = True
-        Me.Label7.Location = New System.Drawing.Point(248, 55)
-        Me.Label7.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label7.Name = "Label7"
-        Me.Label7.Size = New System.Drawing.Size(80, 17)
-        Me.Label7.TabIndex = 6
-        Me.Label7.Text = "Current ID :"
-        '
-        'lblCurrentID
-        '
-        Me.lblCurrentID.AutoSize = True
-        Me.lblCurrentID.Location = New System.Drawing.Point(336, 55)
-        Me.lblCurrentID.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.lblCurrentID.Name = "lblCurrentID"
-        Me.lblCurrentID.Size = New System.Drawing.Size(21, 17)
-        Me.lblCurrentID.TabIndex = 7
-        Me.lblCurrentID.Text = "ID"
+        Me.btnAuto.Location = New System.Drawing.Point(499, 135)
+        Me.btnAuto.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnAuto.Name = "btnAuto"
+        Me.btnAuto.Size = New System.Drawing.Size(52, 32)
+        Me.btnAuto.TabIndex = 6
+        Me.btnAuto.Text = "Auto"
+        Me.btnAuto.UseVisualStyleBackColor = True
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(697, 194)
-        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.btnAuto)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.btnImport)
@@ -348,8 +348,18 @@ Partial Class Form1
     Friend WithEvents lblFrom As System.Windows.Forms.Label
     Friend WithEvents Timer1 As System.Windows.Forms.Timer
     Friend WithEvents Timer2 As System.Windows.Forms.Timer
-    Friend WithEvents Button1 As System.Windows.Forms.Button
+    Friend WithEvents btnAuto As System.Windows.Forms.Button
     Friend WithEvents lblCurrentID As System.Windows.Forms.Label
     Friend WithEvents Label7 As System.Windows.Forms.Label
+
+    Public Sub New()
+
+        ' This call is required by the designer.
+        InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+    End Sub
+
 
 End Class

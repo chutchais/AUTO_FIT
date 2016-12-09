@@ -10,9 +10,11 @@ Public Class Form1
     Dim vServiceURL As String
     Dim vOutPutFolder As String
     Dim vLastID As String
+    Dim vAutoRun As Boolean
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles btnDatabase.Click
         'Dim objFits As New clsFits
+
         Try
             If btnDatabase.Text = "&Disconnect Database." Then
                 cn.Close()
@@ -20,34 +22,34 @@ Public Class Form1
                 initialControl()
             Else
                 tssDatabase.Text = "Connecting Database..." : Application.DoEvents()
+                cn = objFits.connect()
+                cnAutoTest = objAutoTest.connect()
+                'objFits = New clsFits
+                'With objFits
+                '    .user = objInI.GetString("database", "user", "")
+                '    .password = objInI.GetString("database", "password", "")
+                '    .server = objInI.GetString("database", "server", "")
+                '    .database = objInI.GetString("database", "database", "")
+                '    cn = .connect()
+                '    tssDatabase.Text = "(" & .server & "/" & .database & ")Database connected." : Application.DoEvents()
+                'End With
 
-                objFits = New clsFits
-                With objFits
-                    .user = objInI.GetString("database", "user", "")
-                    .password = objInI.GetString("database", "password", "")
-                    .server = objInI.GetString("database", "server", "")
-                    .database = objInI.GetString("database", "database", "")
-                    cn = .connect()
-                    tssDatabase.Text = "(" & .server & "/" & .database & ")Database connected." : Application.DoEvents()
-                End With
-
-                'Open AutoTest database
-                objAutoTest = New clsAutoTest
-                With objAutoTest
-                    .user = objInI.GetString("test database", "user", "")
-                    .password = objInI.GetString("test database", "password", "")
-                    .server = objInI.GetString("test database", "server", "")
-                    .database = objInI.GetString("test database", "database", "")
-                    cnAutoTest = .connect()
-                End With
+                ''Open AutoTest database
+                'objAutoTest = New clsAutoTest
+                'With objAutoTest
+                '    .user = objInI.GetString("test database", "user", "")
+                '    .password = objInI.GetString("test database", "password", "")
+                '    .server = objInI.GetString("test database", "server", "")
+                '    .database = objInI.GetString("test database", "database", "")
+                '    cnAutoTest = .connect()
+                'End With
 
                 btnDatabase.Text = "&Disconnect Database."
                 btnImport.Enabled = True
             End If
 
         Catch ex As Exception
-            MsgBox("Unable to connect database!!!" & vbCrLf & _
-                "Because " & ex.Message, MsgBoxStyle.Critical, "Unable to connect database")
+            Log(Now() & "--Unable to connect database!!!")
             tssDatabase.Text = "Database error!" : Application.DoEvents()
             initialControl()
         End Try
@@ -63,6 +65,25 @@ Public Class Form1
 
     '##Look at vw_SMTUnitHistoryTracking First.
     Sub ExportData()
+
+        'Add by Chutchai S on Dec 9,2016
+        'To verify /Reconnect connections (cn,cnAutoTest)
+        If cn.State = 0 Then
+            objFits.reconnect()
+        End If
+        If cnAutoTest.State = 0 Then
+            objAutoTest.reconnect()
+        End If
+
+        If cn.State = 0 Or cnAutoTest.State = 0 Then
+            Log(Now() & "-- Database is closed (FIT=" & cn.State & " and ATS=" & cnAutoTest.State)
+            GoTo NoSN
+        End If
+
+        'End Verify Database connection
+
+
+
         Dim vBullEyesObj As New clsBullEyes
         With vBullEyesObj
             'Query Data
@@ -73,7 +94,7 @@ Public Class Form1
 
 
             rs = objAutoTest.getUUTResult(vLastID)
-          
+
 
             If rs.RecordCount = 0 Then
                 lblLastDate.Text = Now() : Application.DoEvents() ' lblNextRun.Text 
@@ -88,7 +109,7 @@ Public Class Form1
                 vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
             End With
             If Not vInitResult Then
-                MsgBox("Unable to initial FITSDLL", MsgBoxStyle.Critical, "Unable to initial FITDLL")
+                Log(Now() & "--Unable to initial FITSDLL")
                 Exit Sub
             End If
             '--------------
@@ -123,7 +144,7 @@ Public Class Form1
                 Dim vDeviceTypeCheck As Boolean = False
                 vDeviceTypeCheck = IIf(vDeviceTypeATS = vDeviceTypeFit, True, False)
 
-                
+
 
                 'vModel = objFITS.fn_Query(txtModel.Text, vKittingStation, "1", rs.Fields(""), "Model")
                 Select Case vModel
@@ -563,14 +584,60 @@ NoSN:
         If MsgBox("Are you sure to close program", vbQuestion + vbYesNo, "Confrim close program") = vbYes Then
             On Error Resume Next
             objFits.disconnect()
+            objAutoTest.disconnect()
             Me.Close()
         End If
 
     End Sub
 
+    Private Sub Form1_Activated(sender As Object, e As EventArgs) Handles Me.Activated
+       
+
+    End Sub
+
+    Private Sub Form1_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        Try
+            cn.Close()
+            cnAutoTest.Close()
+        Catch ex As Exception
+
+        End Try
+        
+    End Sub
+
+
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles Me.Load
+    
+
+        'Me.IsHandleCreated
+
+
         objInI = New clsINI(Application.StartupPath & "\import.ini")
+
+        'Initial all objects
+        objFits = New clsFits
+        With objFits
+            .user = objInI.GetString("database", "user", "")
+            .password = objInI.GetString("database", "password", "")
+            .server = objInI.GetString("database", "server", "")
+            .database = objInI.GetString("database", "database", "")
+            'cn = .connect()
+            tssDatabase.Text = "(" & .server & "/" & .database & ")Database connected." : Application.DoEvents()
+        End With
+
+        'Open AutoTest database
+        objAutoTest = New clsAutoTest
+        With objAutoTest
+            .user = objInI.GetString("test database", "user", "")
+            .password = objInI.GetString("test database", "password", "")
+            .server = objInI.GetString("test database", "server", "")
+            .database = objInI.GetString("test database", "database", "")
+            'cnAutoTest = .connect()
+        End With
+        '--------------------
+
+
         Timer1.Interval = (Val(objInI.GetString("import", "interval", ""))) * 1000 * 60
         Timer1.Enabled = False
 
@@ -584,16 +651,26 @@ NoSN:
         initialControl()
         lblCurrentID.Text = vLastID
         Me.Text = Me.Text + " version : " + Application.ProductVersion.Trim()
+
+        'Auto Mode Check
+        vAutoRun = IIf(objInI.GetString("running mode", "auto", "") = "True", True, False)
+        If vAutoRun Then
+            btnAuto.BackColor = Color.Green
+
+            Button1_Click(sender, e) : Application.DoEvents()
+            btnImport_Click(sender, e) : Application.DoEvents()
+        Else
+            btnAuto.BackColor = Color.Red
+        End If
+       
     End Sub
 
     Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         'First import then using Timer.
         If btnImport.Text = "&Start Import data" Then
-            'Added by Chutchai on Dec 7,2016
-            'To verify all database connection
-            'If objFits.database .
 
             ExportData()
+
             Timer1.Enabled = True
             btnImport.Text = "&Stop Import data"
             Timer2.Enabled = True
@@ -610,7 +687,14 @@ NoSN:
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
         Timer1.Enabled = False
         Timer2.Enabled = False
+
+
+
         ExportData()
+
+NoConnection:
+
+
         lblNextRun.Text = Now.AddMinutes(Val(objInI.GetString("import", "interval", "")))
         Timer1.Enabled = True
         Timer2.Enabled = True
@@ -630,7 +714,7 @@ NoSN:
         Return String.Format("{0:00}:{1:00}:{2:00}", CInt(Math.Floor(RemainingTime.TotalHours)) Mod 60, CInt(Math.Floor(RemainingTime.TotalMinutes)) Mod 60, CInt(Math.Floor(RemainingTime.TotalSeconds)) Mod 60).Replace("-", "")
     End Function
 
-    Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles btnAuto.Click
         uploadData("C:\Users\chutchais\Documents\Visual Studio 2013\Projects\test.xml")
     End Sub
 End Class
