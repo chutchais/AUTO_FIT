@@ -509,28 +509,46 @@ Public Class clsAutoTest
 
     Public Function getUUTResult(vUUTID As String) As ADODB.Recordset
         'Date format : 2016-07-01
-        Dim vSql As String = "select * " & _
+        Try
+            Dim vSql As String = "select * " & _
                             "from uut_result " & _
                             "where process in ('DCP','DBI','FTU','FPT','FAT','OBS','FVT','EPT','ESS','FST','EXS','CFG') " & _
                             "and id > ?  and uut_status <>'Error'" & _
                             "order by id"
-        'order by start_date_time
-        'PIC level : 'DCP','DBI','FTU','FPT','FAT'
-        'Module level : 'OBS','FVT','EPT','ESS','FST','EXS','CFG'
-        Dim cmd As New ADODB.Command()
-        Dim sDateFromParam As ADODB.Parameter
+            'order by start_date_time
+            'PIC level : 'DCP','DBI','FTU','FPT','FAT'
+            'Module level : 'OBS','FVT','EPT','ESS','FST','EXS','CFG'
+            Dim cmd As New ADODB.Command()
+            Dim sDateFromParam As ADODB.Parameter
 
-        With cmd
-            .ActiveConnection = cn
-            .CommandText = vSql
-            .CommandType = CommandTypeEnum.adCmdText
-            sDateFromParam = .CreateParameter("vDateFrom", DataTypeEnum.adBigInt, _
-                                                 ParameterDirectionEnum.adParamInput, 50, vUUTID)
-            .Parameters.Append(sDateFromParam)
-            getUUTResult = .Execute
-        End With
+            If cn.State <> 1 Then
+                cn.Open()
+            End If
+
+            With cmd
+                .ActiveConnection = cn
+                .CommandText = vSql
+                .CommandType = CommandTypeEnum.adCmdText
+                sDateFromParam = .CreateParameter("vDateFrom", DataTypeEnum.adInteger, _
+                                                     ParameterDirectionEnum.adParamInput, 50, vUUTID)
+                .Parameters.Append(sDateFromParam)
+                getUUTResult = .Execute
+            End With
+        Catch ex As Exception
+
+            Log(Now() + " Error on getUUTResult : " & ex.Message)
+            getUUTResult = Nothing
+        End Try
+        
 
     End Function
+
+    Sub Log(vMessage As String)
+        Dim file As System.IO.StreamWriter
+        file = My.Computer.FileSystem.OpenTextFileWriter("d:\" & Now().ToString("yyyy-M-dd") & ".txt", True) '"2016-11-30.txt"
+        file.WriteLine(vMessage)
+        file.Close()
+    End Sub
 
     Public Function getEvents(vDateFrom As String, vDateTo As String) As ADODB.Recordset
         'Date format : 2016-07-01
@@ -818,7 +836,13 @@ NextLoop:
 
         If vRst.RecordCount = 0 Then
             vUutResult = "Terminated = Not found failed test record"
+            getTestDataString = vUutResult
+            Exit Function
+
         End If
+
+ 
+
 
         vRst.MoveLast()
         Dim vSympTom As String

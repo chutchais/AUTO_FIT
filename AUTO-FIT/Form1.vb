@@ -95,6 +95,12 @@ Public Class Form1
 
             rs = objAutoTest.getUUTResult(vLastID)
 
+            If rs Is Nothing Then
+                lblLastDate.Text = Now() : Application.DoEvents() ' lblNextRun.Text 
+                'GoTo NoSN
+                Me.Close()
+            End If
+
 
             If rs.RecordCount = 0 Then
                 lblLastDate.Text = Now() : Application.DoEvents() ' lblNextRun.Text 
@@ -715,6 +721,6 @@ NoConnection:
     End Function
 
     Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles btnAuto.Click
-        uploadData("C:\Users\chutchais\Documents\Visual Studio 2013\Projects\test.xml")
+        'Me.Close()
     End Sub
 End Class
