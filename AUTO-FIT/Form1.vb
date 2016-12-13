@@ -275,19 +275,26 @@ Public Class Form1
                     End If
                 End If
 
-
-
+                'Add by Chutchai on Dec 13,2016 
+                'To put EN number into FIT by mapping from setting.
+                Dim vEn As String
+                If vLoginName <> "" Then
+                    vEn = objInI.GetString("operator", vLoginName, "000000")
+                Else
+                    vEn = "000000"
+                End If
+                '------------------------------------------------------------
 
                 Dim vTest1 As String = "FBN Serial No|Login Name|Product Code|" & _
                                    "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
                                    "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV.|" & _
-                                   "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)"
+                                   "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)|EN"
 
                 Dim vTest2 As String = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
                                 vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
                                 vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
                                 Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
-                                vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS
+                                vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn
                 Dim vCheckIn As String
                 Dim vCheckOut As String
                 vLastID = vUutID
