@@ -225,7 +225,7 @@ Public Class Form1
 
 
                 vHandShake = objFITSDLL.fn_Handshake(vModel, vExeStation, "2.9", vSn)
-                If vHandShake <> "True" Then
+                If vHandShake <> "True" And Not vHandShake.Contains("in-processing in " & vExeStation) Then
                     WrongRoutingLog(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vUutID & "--" & vHandShake)
                     GoTo nextSN
                 End If
