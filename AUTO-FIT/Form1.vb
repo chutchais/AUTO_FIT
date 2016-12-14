@@ -226,6 +226,7 @@ Public Class Form1
 
                 vHandShake = objFITSDLL.fn_Handshake(vModel, vExeStation, "2.9", vSn)
                 If vHandShake <> "True" Then
+                    WrongRoutingLog(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vUutID & "--" & vHandShake)
                     GoTo nextSN
                 End If
 
@@ -258,7 +259,7 @@ Public Class Form1
                     'Keep Terminated ID
                     'vRemark = getTerminatedText(vSn, vProcess, vUutID)
                     'vDisposCode = "Terminated"
-                    TerminatedLog(Now() & "--" & vSn & "," & vModel & "," & vProcess & "," & vUutID)
+                    TerminatedLog(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vUutID)
                     GoTo nextSN
                 End If
 
@@ -511,6 +512,13 @@ NoSN:
     Sub TerminatedLog(vMessage As String)
         Dim file As System.IO.StreamWriter
         file = My.Computer.FileSystem.OpenTextFileWriter(vOutPutFolder & Now().ToString("yyyy-M-dd") & "_Terminated.txt", True) '"2016-11-30.txt"
+        file.WriteLine(vMessage)
+        file.Close()
+    End Sub
+
+    Sub WrongRoutingLog(vMessage As String)
+        Dim file As System.IO.StreamWriter
+        file = My.Computer.FileSystem.OpenTextFileWriter(vOutPutFolder & Now().ToString("yyyy-M-dd") & "_WrongRoute.txt", True) '"2016-11-30.txt"
         file.WriteLine(vMessage)
         file.Close()
     End Sub
