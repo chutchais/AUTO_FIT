@@ -128,6 +128,7 @@ Public Class Form1
                 '1)=========HandShake============
                 'Get Model by Serial number
                 Dim vModel As String
+                Dim vModelType As String
                 Dim vKittingStation As String = "100"
                 Dim vExeStation As String = ""
                 Dim vHandShake As String
@@ -141,9 +142,11 @@ Public Class Form1
                 lblCurrentID.Text = vUutID
                 vLastID = vUutID
 
-                vModel = objFits.getParameters(vSn, "1003")
-                vHWPartFIT = objFits.getParameters(vSn, "10112")
+                vModelType = objFits.getEventMaster(vSn, "model_type")
+                vModel = objFits.getEventMaster(vSn, "model")
 
+                vHWPartFIT = objFits.getParameters(vSn, "10112")
+                vModel = vModelType
 
                 vDeviceTypeFit = objFits.getParameters(vSn, "1204")
                 vDeviceTypeATS = objAutoTest.getDeviceType(vSn, "DCP")
@@ -153,8 +156,8 @@ Public Class Form1
 
 
                 'vModel = objFITS.fn_Query(txtModel.Text, vKittingStation, "1", rs.Fields(""), "Model")
-                Select Case vModel
-                    Case "Acadia"
+                Select Case vModel.ToUpper
+                    Case "ACADIA"
                         Select Case vProcess
                             Case "DCP" : vExeStation = "180"
                             Case "DBI" : vExeStation = "190"
@@ -212,6 +215,17 @@ Public Class Form1
                         End Select
 
                     Case "AC400"
+                        Select Case vProcess
+                            Case "OBS" : vExeStation = "190"
+                            Case "FVT" : vExeStation = "250"
+                            Case "EPT" : vExeStation = "260"
+                            Case "ESS" : vExeStation = "270"
+                            Case "FST" : vExeStation = "280"
+                            Case "EXS" : vExeStation = "290"
+                            Case "CFG" : vExeStation = "325"
+                        End Select
+
+                    Case "AC400 [Non ETOF]"
                         Select Case vProcess
                             Case "OBS" : vExeStation = "190"
                             Case "FVT" : vExeStation = "250"

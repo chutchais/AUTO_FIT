@@ -397,6 +397,38 @@ NextLoop:
     End Function
 
 
+    Public Function getEventMaster(vSerialnumber As String, vFieldName As String) As String
+        Try
+            'Date format : 2016-07-01
+            Dim vSql As String = "select * " & _
+                                 "from event_master " & _
+                                 "where serial_no=? "
+
+            Dim cmd As New ADODB.Command()
+            Dim sSnParam As ADODB.Parameter
+            Dim vRstTmp As New ADODB.Recordset
+
+            With cmd
+                .ActiveConnection = cn
+                .CommandText = vSql
+                .CommandType = CommandTypeEnum.adCmdText
+                sSnParam = .CreateParameter("vSerialnumber", DataTypeEnum.adVarChar, _
+                                                     ParameterDirectionEnum.adParamInput, 50, vSerialnumber)
+                .Parameters.Append(sSnParam)
+                vRstTmp = .Execute
+                If vRstTmp.RecordCount > 0 Then
+                    Return vRstTmp.Fields(vFieldName).Value
+                Else
+                    Return ""
+                End If
+            End With
+        Catch ex As Exception
+            Return ""
+        End Try
+
+    End Function
+
+
 
 
 
