@@ -504,22 +504,28 @@ NoSN:
 
     Sub Log(vMessage As String)
         Dim file As System.IO.StreamWriter
+        Dim vNewMessage As String
+        vNewMessage = vMessage.Replace(vbCr, "").Replace(vbLf, "")
         file = My.Computer.FileSystem.OpenTextFileWriter(vOutPutFolder & Now().ToString("yyyy-M-dd") & ".txt", True) '"2016-11-30.txt"
-        file.WriteLine(vMessage)
+        file.WriteLine(vNewMessage)
         file.Close()
     End Sub
 
     Sub TerminatedLog(vMessage As String)
         Dim file As System.IO.StreamWriter
+        Dim vNewMessage As String
+        vNewMessage = vMessage.Replace(vbCr, "").Replace(vbLf, "")
         file = My.Computer.FileSystem.OpenTextFileWriter(vOutPutFolder & Now().ToString("yyyy-M-dd") & "_Terminated.txt", True) '"2016-11-30.txt"
-        file.WriteLine(vMessage)
+        file.WriteLine(vNewMessage)
         file.Close()
     End Sub
 
     Sub WrongRoutingLog(vMessage As String)
         Dim file As System.IO.StreamWriter
+        Dim vNewMessage As String
+        vNewMessage = vMessage.Replace(vbCr, "").Replace(vbLf, "")
         file = My.Computer.FileSystem.OpenTextFileWriter(vOutPutFolder & Now().ToString("yyyy-M-dd") & "_WrongRoute.txt", True) '"2016-11-30.txt"
-        file.WriteLine(vMessage)
+        file.WriteLine(vNewMessage)
         file.Close()
     End Sub
 
