@@ -225,7 +225,7 @@ Public Class Form1
                             Case "CFG" : vExeStation = "325"
                         End Select
 
-                    Case "AC400 [Non ETOF]"
+                    Case "AC400 [NON ETOF]"
                         Select Case vProcess
                             Case "OBS" : vExeStation = "190"
                             Case "FVT" : vExeStation = "250"
