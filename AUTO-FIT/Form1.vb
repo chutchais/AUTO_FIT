@@ -67,7 +67,7 @@ Public Class Form1
     Sub ExportData()
 
         If Now.Minute < 5 Then
-            TerminatedLog("Terminated Program...")
+            TerminatedLog(Now() & " -- Terminated Program...")
             Close()
             Exit Sub
         End If
