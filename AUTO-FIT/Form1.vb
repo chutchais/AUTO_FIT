@@ -66,6 +66,12 @@ Public Class Form1
     '##Look at vw_SMTUnitHistoryTracking First.
     Sub ExportData()
 
+        If Now.Minute < 5 Then
+            TerminatedLog("Terminated Program...")
+            Close()
+            Exit Sub
+        End If
+
         'Add by Chutchai S on Dec 9,2016
         'To verify /Reconnect connections (cn,cnAutoTest)
         If cn.State = 0 Then
@@ -726,6 +732,8 @@ NoSN:
     End Sub
 
     Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+
+
         Timer1.Enabled = False
         Timer2.Enabled = False
 
