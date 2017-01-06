@@ -66,11 +66,7 @@ Public Class Form1
     '##Look at vw_SMTUnitHistoryTracking First.
     Sub ExportData()
 
-        If Now.Minute < 5 Then
-            TerminatedLog(Now() & " -- Terminated Program...")
-            Close()
-            Exit Sub
-        End If
+        
 
         'Add by Chutchai S on Dec 9,2016
         'To verify /Reconnect connections (cn,cnAutoTest)
@@ -335,107 +331,6 @@ Public Class Form1
                 '---------
                 '2)=========Check In =========================
 
-
-
-
-
-                'Dim vTest1 As String = "FBN Serial No|Status|Login Name|Product Code|" & _
-                '    "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
-                '    "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV."
-                'Dim vTest2 As String = "" & "|PASS|nyotpanya|SIPH100-Q01-001|143210059|ATE_SIPH_057|2016-11-29 09:43:56.000|51.6991105|Production|1|1|1.1.1|27|-"
-
-
-
-                ''.operation = rs.Fields("operation").Value
-
-                ''.datetimeout = IIf(IsDBNull(rs.Fields("date_time").Value), "", rs.Fields("date_time").Value)
-
-                ''If Not (.operation = "3261") Then
-                ''    GoTo nextSN
-                ''End If
-
-                ''.serialnumber = rs.Fields("serial_no").Value
-                ''.sn_attr_code = rs.Fields("sn_attr_code").Value
-                ''.trans_seq = rs.Fields("trans_seq").Value
-
-
-
-                ''-----Get PCB Info -----
-                ' ''History (only EBT)
-                ''Dim vPCBHistory As ADODB.Recordset
-                'Dim vPCBSN As String = rs.Fields("serial_no").Value
-
-                ''vPCBHistory = objFits.getPCBAlist(vPCBSN)
-                ' ''Comp.onent tracking (Only value is not 0)
-                ''If vPCBHistory.RecordCount = 0 Then
-                ''    GoTo nextSN
-                ''End If
-                ''vPCBHistory.MoveLast()
-
-                ''Dim vEBTstation As String = vPCBHistory.Fields("operation").Value
-                ''.operation = vEBTstation
-
-                ''Dim vDateOutPCB As String = vPCBHistory.Fields("date_time").Value
-                'Dim vTesterPCB As String = "ATE_AC100M_062"
-                ''-----------------------
-                ''Modify all Parameter
-                'Dim vTempTimeOut As String = .datetimeout
-
-                '.serialnumber = vPCBSN
-                '.workorder = rs.Fields("workorder").Value
-                '.model = "PCBA" 'set family
-
-                '.partnumber = rs.Fields("part_no").Value
-                '.operation = rs.Fields("operation").Value
-                '.operationname = IIf(IsDBNull(rs.Fields("description").Value), "", rs.Fields("description").Value)
-                '.buildtype = "PROD" 'rs.Fields("buildtype").Value
-                '.runtype = "100" 'rs.Fields("runtype").Value
-                '.employee = rs.Fields("emp_no").Value
-                '.sn_attr_code = "1001" 'rs.Fields("sn_attr_code").Value
-                '.trans_seq = rs.Fields("trans_seq").Value 'vPCBHistory.Fields("date_time").Value
-                '.datetimein = rs.Fields("date_time").Value
-                '.datetimeout = rs.Fields("date_time").Value
-                '.shift = "DAY" 'rs.Fields("shift").Value
-                '.tester = vTesterPCB 'rs.Fields("equip_id").Value
-                '.outputPath = vWorkingDir
-                '.result = IIf(IsDBNull(rs.Fields("result").Value), "PASS", rs.Fields("result").Value)
-                '.disposecode = IIf(IsDBNull(rs.Fields("result").Value), "", rs.Fields("result").Value)
-                '.next_operation = "382" ' objFits.getNextStation(.serialnumber, .operation, .trans_seq, .model)
-                ''End Modify
-
-
-
-
-                ''Get Testing Data
-                ''1)get Process from BullsEye -- by Station.
-                'Dim vProcess As String = requestData(vServiceURL & "production/station/" & .operation & "/" & .model & "/")
-                ''2)get Measurement data.
-                'Dim vTestDataRst As New ADODB.Recordset
-
-
-                'If vProcess <> "" And vProcess <> "None" Then
-                '    vTestDataRst = objAutoTest.getTestData(.serialnumber, vProcess, .tester, .datetimeout)
-                '    '.tester = vTestDataRst.Fields("STATION_ID").Value
-                'Else
-                '    vTestDataRst = Nothing
-                'End If
-
-                ''Get Component--
-                ''Dim vRstComponent As ADODB.Recordset
-                ''vRstComponent = objFits.getComponentData(.serialnumber)
-                ''If vRstComponent.RecordCount > 0 Then
-                ''    tssStatus.Text = "Uploading " & .serialnumber & " " & rs.AbsolutePosition & "/" & rs.RecordCount : Application.DoEvents()
-                ''End If
-                ''---------------
-
-
-
-                ''.makeXML(Nothing, vTestDataRst)
-                ''.makeXML(objFits.getParameters(.serialnumber, .sn_attr_code, .trans_seq), vTestDataRst, vRstComponent)
-
-
-
-                '' uploadData(.outputfile)
                 .datetimeout = vTempTimeOut
 
 nextSN:
@@ -457,6 +352,11 @@ NoSN:
         lblTo.Text = getDateTo(lblLastDate.Text)
         lblNextRun.Text = Now.AddMinutes(Val(objInI.GetString("import", "interval", "")))
 
+        If Now.Minute < 5 Then
+            TerminatedLog(Now() & " -- Terminated Program...")
+            Close()
+            Exit Sub
+        End If
     End Sub
 
     Function getFailedText(vSn As String, vProcess As String, vID As String) As String
