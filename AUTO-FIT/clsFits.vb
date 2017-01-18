@@ -876,7 +876,11 @@ NextLoop:
  
 
 
-        vRst.MoveLast()
+        'vRst.MoveLast()
+        'Edit by Chutchai on Jan 18,2017
+        'To get first failure in list -- requested by En.Nopporn
+        vRst.MoveFirst()
+
         Dim vSympTom As String
         Dim vFailDetail As String
 
