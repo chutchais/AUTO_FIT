@@ -544,10 +544,27 @@ Public Class clsAutoTest
         Try
             Dim vSql As String = "select * " & _
                             "from uut_result " & _
-                            "where process in ('DCP','DBI','FTU','FPT','FAT','OBS','FVT','EPT','ESS','FST','EXS','CFG') " & _
+                            "where process in ('EBT','DCP','DBI','FTU','FPT','FAT','OBS','FVT','EPT','ESS','FST','EXS','CFG') " & _
                             "and id > ?  and uut_status <>'Error'" & _
                             "order by id"
+            'Dim vSql As String = "select * " & _
+            '                "from uut_result " & _
+            '                "where process in ('FAT') " & _
+            '                "and uut_serial_number in ('170356884','170356834') and id=675929  and uut_status <>'Error'" & _
+            '                "order by id"
+            'Dim vSql As String = "select * " & _
+            '                "from uut_result " & _
+            '                "where process in ('EBT') " & _
+            '                "and id > ?  and uut_status <>'Error'" & _
+            '                "order by id"
             'order by start_date_time
+            'PCB level' : 'EBT'
+            '550-0021-00B
+            '550-0021-00C
+            '550-0021-10C
+            '550-0021-12C
+            '550-0055-02B
+            '550-0055-12B
             'PIC level : 'DCP','DBI','FTU','FPT','FAT'
             'Module level : 'OBS','FVT','EPT','ESS','FST','EXS','CFG'
             Dim cmd As New ADODB.Command()

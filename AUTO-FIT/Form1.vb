@@ -65,8 +65,8 @@ Public Class Form1
 
     '##Look at vw_SMTUnitHistoryTracking First.
     Sub ExportData()
-
-        
+        'Add error handling to fix Error on March 8,2017
+        Try
 
         'Add by Chutchai S on Dec 9,2016
         'To verify /Reconnect connections (cn,cnAutoTest)
@@ -113,13 +113,17 @@ Public Class Form1
             Dim objFITSDLL As New FITSDLL.clsDB
             Dim vInitResult As Boolean
 
-            With objFITSDLL
-                vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
-            End With
-            If Not vInitResult Then
-                Log(Now() & "--Unable to initial FITSDLL")
-                Exit Sub
-            End If
+            'Comment by Chutchai on Feb 16,2017 -- To support EBT station (PCB level)
+
+
+            'With objFITSDLL
+            '    'vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
+            '    vInitResult = .fn_InitDB("*", "", "2.9", "dbSMT_BU")
+            'End With
+            'If Not vInitResult Then
+            '    Log(Now() & "--Unable to initial FITSDLL")
+            '    Exit Sub
+            'End If
             '--------------
             Dim vTempTimeOut As String
             Do While Not rs.EOF
@@ -139,22 +143,34 @@ Public Class Form1
                 Dim vHWPartFIT As String = ""
                 Dim vUutID As String = rs.Fields("id").Value
                 Dim vProcess As String = rs.Fields("process").Value
-                Dim vDeviceTypeFit As String
-                Dim vDeviceTypeATS As String
+                Dim vDeviceTypeFit As String = ""
+                Dim vDeviceTypeATS As String = ""
                 lblCurrentID.Text = vUutID
                 vLastID = vUutID
 
-                vModelType = objFits.getEventMaster(vSn, "model_type")
-                vModel = objFits.getEventMaster(vSn, "model")
-
-                vHWPartFIT = objFits.getParameters(vSn, "10112")
-                vModel = vModelType
-
-                vDeviceTypeFit = objFits.getParameters(vSn, "1204")
-                vDeviceTypeATS = objAutoTest.getDeviceType(vSn, "DCP")
                 Dim vDeviceTypeCheck As Boolean = False
-                vDeviceTypeCheck = IIf(vDeviceTypeATS = vDeviceTypeFit, True, False)
 
+                If vProcess = "EBT" Then
+                    With objFITSDLL
+                        vInitResult = .fn_InitDB("*", "", "2.9", "dbSMT_BU")
+                    End With
+                    vExeStation = "3261"
+                    vModel = objFITSDLL.fn_Query("", vExeStation, "2.9", vSn, "Part_Number")
+                Else
+                    With objFITSDLL
+                        vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
+                    End With
+                    vModelType = objFits.getEventMaster(vSn, "model_type")
+                    vModel = objFits.getEventMaster(vSn, "model")
+
+                    vHWPartFIT = objFits.getParameters(vSn, "10112")
+                    vModel = vModelType
+
+                    vDeviceTypeFit = objFits.getParameters(vSn, "1204")
+                    vDeviceTypeATS = objAutoTest.getDeviceType(vSn, "DCP")
+
+                    vDeviceTypeCheck = IIf(vDeviceTypeATS = vDeviceTypeFit, True, False)
+                End If
 
 
                 'vModel = objFITS.fn_Query(txtModel.Text, vKittingStation, "1", rs.Fields(""), "Model")
@@ -301,17 +317,31 @@ Public Class Form1
                     vEn = "000000"
                 End If
                 '------------------------------------------------------------
+                Dim vTest1 As String
+                Dim vTest2 As String
+                If vProcess = "EBT" Then
+                    vTest1 = "PCBA S/N|Login Name|Product Code|Fixture ID|" & _
+                        "Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
+                        "TEST_SOCKET_INDEX|TPS_REV|HW_REV|EBT Result|FAIL MODE"
 
-                Dim vTest1 As String = "FBN Serial No|Login Name|Product Code|" & _
-                                   "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
-                                   "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV.|" & _
-                                   "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)|EN"
+                    vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
+                                    vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
+                                    vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & IIf(vResult = "Passed", "PASS", "FAIL") & "|" & _
+                                    vDisposCode
 
-                Dim vTest2 As String = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
-                                vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
-                                vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
-                                Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
-                                vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn
+                Else
+                    vTest1 = "FBN Serial No|Login Name|Product Code|" & _
+                                       "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
+                                       "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV.|" & _
+                                       "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)|EN"
+
+                    vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
+                                    vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
+                                    vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
+                                    Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
+                                    vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn
+                End If
+
                 Dim vCheckIn As String
                 Dim vCheckOut As String
                 vLastID = vUutID
@@ -320,6 +350,11 @@ Public Class Form1
                         'Need both check in and Out
                         vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "0", "FBN Serial No", vSn)
                         vCheckOut = objFITSDLL.fn_Log(vModel, vExeStation, "1", vTest1, vTest2, "|")
+
+                        'vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "5", "FBN Serial No", vSn) 'Checkout Delete
+                        'vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "6", "FBN Serial No", vSn) 'Checkin Delete 
+
+
                         Log(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vExeStation & "--" & vLastID & "--" & vCheckOut & "--" & IIf(vResult = "Passed", "PASS", vDisposCode))
                     Case vHandShake.Contains("in-processing in " & vExeStation)
                         'already check-in,Need only Check-out
@@ -352,11 +387,17 @@ NoSN:
         lblTo.Text = getDateTo(lblLastDate.Text)
         lblNextRun.Text = Now.AddMinutes(Val(objInI.GetString("import", "interval", "")))
 
-        If Now.Minute < 5 Then
-            TerminatedLog(Now() & " -- Terminated Program...")
+            If Now.Minute < 5 Then
+                TerminatedLog(Now() & " -- Terminated Program...")
+                Close()
+                Exit Sub
+            End If
+
+        Catch ex As Exception
+            TerminatedLog(Now() & " -- Error exception : " & ex.Message)
             Close()
             Exit Sub
-        End If
+        End Try
     End Sub
 
     Function getFailedText(vSn As String, vProcess As String, vID As String) As String
