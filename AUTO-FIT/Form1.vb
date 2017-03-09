@@ -144,7 +144,7 @@ Public Class Form1
                 Dim vUutID As String = rs.Fields("id").Value
                 Dim vProcess As String = rs.Fields("process").Value
                 Dim vDeviceTypeFit As String = ""
-                Dim vDeviceTypeATS As String = ""
+                    Dim vDeviceTypeATS As String = ""
                 lblCurrentID.Text = vUutID
                 vLastID = vUutID
 
@@ -310,12 +310,16 @@ Public Class Form1
 
                 'Add by Chutchai on Dec 13,2016 
                 'To put EN number into FIT by mapping from setting.
-                Dim vEn As String
-                If vLoginName <> "" Then
-                    vEn = objInI.GetString("operator", vLoginName, "000000")
-                Else
-                    vEn = "000000"
-                End If
+                    Dim vEn As String
+                    If vLoginName <> "" Then
+                        vEn = objInI.GetString("operator", vLoginName, "000000")
+                    Else
+                        vEn = "000000"
+                    End If
+                    Dim vCustomer As String = ""
+                    If vProcess = "CFG" Then
+                        vCustomer = objAutoTest.getCustomerString(vSn, vProcess, vUutID)
+                    End If
                 '------------------------------------------------------------
                 Dim vTest1 As String
                 Dim vTest2 As String
@@ -330,16 +334,16 @@ Public Class Form1
                                     vDisposCode
 
                 Else
-                    vTest1 = "FBN Serial No|Login Name|Product Code|" & _
-                                       "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
-                                       "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV.|" & _
-                                       "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)|EN"
+                        vTest1 = "FBN Serial No|Login Name|Product Code|" & _
+                                           "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
+                                           "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV.|" & _
+                                           "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)|EN|Customer"
 
-                    vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
-                                    vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
-                                    vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
-                                    Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
-                                    vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn
+                        vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
+                                        vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
+                                        vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
+                                        Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
+                                        vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn & "|" & vCustomer
                 End If
 
                 Dim vCheckIn As String

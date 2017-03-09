@@ -557,6 +557,11 @@ Public Class clsAutoTest
             '                "where process in ('EBT') " & _
             '                "and id > ?  and uut_status <>'Error'" & _
             '                "order by id"
+            'Dim vSql As String = "select * " & _
+            '                "from uut_result " & _
+            '                "where process in ('CFG') " & _
+            '                "and id > ?  and uut_status <>'Error'" & _
+            '                "order by id"
             'order by start_date_time
             'PCB level' : 'EBT'
             '550-0021-00B
@@ -858,6 +863,41 @@ NextLoop:
         End With
     End Function
 
+    Public Function getCustomerString(vSerialnumber As String, vProcess As String, _
+                                ByRef vID As String) As String
+
+        Try
+            Dim vSql As String
+            Dim vUutResult As String
+            vUutResult = vID
+
+            vSql = "select * " & _
+                    "from step_result " & _
+                    "where UUT_RESULT = ? " & _
+                    "and step_name='Get Customer Info from DB'"
+            'and PROP_RESULT.DATA<>'0' 
+            Dim vRst As New ADODB.Recordset
+            Dim cmdUUTResult As New ADODB.Command()
+            Dim sUUTparam As ADODB.Parameter
+            With cmdUUTResult
+                .ActiveConnection = cn
+                .CommandText = vSql
+                .CommandType = CommandTypeEnum.adCmdText
+                sUUTparam = .CreateParameter("vUUTResult", DataTypeEnum.adVarChar, _
+                                                     ParameterDirectionEnum.adParamInput, 50, vID)
+                .Parameters.Append(sUUTparam)
+                vRst = .Execute
+            End With
+            If vRst.RecordCount > 0 Then
+                Return vRst.Fields("report_text").Value
+            Else
+                Return ""
+            End If
+
+        Catch ex As Exception
+            Return ""
+        End Try
+    End Function
 
     Public Function getTestDataString(vSerialnumber As String, vProcess As String, _
                                 ByRef vID As String) As String
