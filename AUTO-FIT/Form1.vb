@@ -111,205 +111,205 @@ Public Class Form1
 
             'Initial Object
             Dim objFITSDLL As New FITSDLL.clsDB
-            Dim vInitResult As Boolean
+                Dim vInitResult As String
 
-            'Comment by Chutchai on Feb 16,2017 -- To support EBT station (PCB level)
+                'Comment by Chutchai on Feb 16,2017 -- To support EBT station (PCB level)
 
 
-            'With objFITSDLL
-            '    'vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
-            '    vInitResult = .fn_InitDB("*", "", "2.9", "dbSMT_BU")
-            'End With
-            'If Not vInitResult Then
-            '    Log(Now() & "--Unable to initial FITSDLL")
-            '    Exit Sub
-            'End If
-            '--------------
-            Dim vTempTimeOut As String
-            Do While Not rs.EOF
+                'With objFITSDLL
+                '    'vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
+                '    vInitResult = .fn_InitDB("*", "", "2.9", "dbSMT_BU")
+                'End With
+                'If Not vInitResult Then
+                '    Log(Now() & "--Unable to initial FITSDLL")
+                '    Exit Sub
+                'End If
+                '--------------
+                Dim vTempTimeOut As String
+                Do While Not rs.EOF
 
-                tssStatus.Text = "Importing......." & rs.AbsolutePosition & "/" & rs.RecordCount : Application.DoEvents()
-                vTempTimeOut = rs.Fields("start_date_time").Value
-                .datetimeout = vTempTimeOut
-                '1)=========HandShake============
-                'Get Model by Serial number
-                Dim vModel As String
-                Dim vModelType As String
-                Dim vKittingStation As String = "100"
-                Dim vExeStation As String = ""
-                Dim vHandShake As String
-                Dim vSnParamName As String = "Serial No."
-                Dim vSn As String = rs.Fields("uut_serial_number").Value
-                Dim vHWPartFIT As String = ""
-                Dim vUutID As String = rs.Fields("id").Value
-                Dim vProcess As String = rs.Fields("process").Value
-                Dim vDeviceTypeFit As String = ""
+                    tssStatus.Text = "Importing......." & rs.AbsolutePosition & "/" & rs.RecordCount : Application.DoEvents()
+                    vTempTimeOut = rs.Fields("start_date_time").Value
+                    .datetimeout = vTempTimeOut
+                    '1)=========HandShake============
+                    'Get Model by Serial number
+                    Dim vModel As String
+                    Dim vModelType As String
+                    Dim vKittingStation As String = "100"
+                    Dim vExeStation As String = ""
+                    Dim vHandShake As String
+                    Dim vSnParamName As String = "Serial No."
+                    Dim vSn As String = rs.Fields("uut_serial_number").Value
+                    Dim vHWPartFIT As String = ""
+                    Dim vUutID As String = rs.Fields("id").Value
+                    Dim vProcess As String = rs.Fields("process").Value
+                    Dim vDeviceTypeFit As String = ""
                     Dim vDeviceTypeATS As String = ""
-                lblCurrentID.Text = vUutID
-                vLastID = vUutID
+                    lblCurrentID.Text = vUutID
+                    vLastID = vUutID
 
-                Dim vDeviceTypeCheck As Boolean = False
+                    Dim vDeviceTypeCheck As Boolean = False
 
-                If vProcess = "EBT" Then
-                    With objFITSDLL
-                        vInitResult = .fn_InitDB("*", "", "2.9", "dbSMT_BU")
-                    End With
-                    vExeStation = "3261"
-                    vModel = objFITSDLL.fn_Query("", vExeStation, "2.9", vSn, "Part_Number")
-                Else
-                    With objFITSDLL
-                        vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
-                    End With
-                    vModelType = objFits.getEventMaster(vSn, "model_type")
-                    vModel = objFits.getEventMaster(vSn, "model")
-
-                    vHWPartFIT = objFits.getParameters(vSn, "10112")
-                    vModel = vModelType
-
-                    vDeviceTypeFit = objFits.getParameters(vSn, "1204")
-                    vDeviceTypeATS = objAutoTest.getDeviceType(vSn, "DCP")
-
-                    vDeviceTypeCheck = IIf(vDeviceTypeATS = vDeviceTypeFit, True, False)
-                End If
-
-
-                'vModel = objFITS.fn_Query(txtModel.Text, vKittingStation, "1", rs.Fields(""), "Model")
-                Select Case vModel.ToUpper
-                    Case "ACADIA"
-                        Select Case vProcess
-                            Case "DCP" : vExeStation = "180"
-                            Case "DBI" : vExeStation = "190"
-                            Case "FTU" : vExeStation = "230"
-                            Case "FPT" : vExeStation = "290"
-                            Case "FAT" : vExeStation = "292"
-                        End Select
-
-                    Case "GLACIER"
-                        Select Case vProcess
-                            Case "DCP" : vExeStation = "118"
-                            Case "DBI" : vExeStation = "120"
-                            Case "FTU" : vExeStation = "126"
-                            Case "FPT" : vExeStation = "144"
-                            Case "FAT" : vExeStation = "146"
-                        End Select
-
-                    Case "SFF[ORION]"
-                        Select Case vProcess
-                            Case "DCP" : vExeStation = "116"
-                            Case "DBI" : vExeStation = "118"
-                            Case "FTU" : vExeStation = "128"
-                            Case "FAT" : vExeStation = "147"
-                        End Select
-
-
-                        'Module Level
-                    Case "CFP"
-                        Select Case vProcess
-                            Case "OBS" : vExeStation = "1400"
-                            Case "FVT" : vExeStation = "1600"
-                            Case "EPT" : vExeStation = "1650"
-                            Case "ESS" : vExeStation = "1700"
-                            Case "EXS" : vExeStation = "1900"
-                            Case "CFG" : vExeStation = "1950"
-                        End Select
-                    Case "CFP GLACIER"
-                        Select Case vProcess
-                            Case "OBS" : vExeStation = "1400"
-                            Case "FVT" : vExeStation = "1600"
-                            Case "EPT" : vExeStation = "1650"
-                            Case "ESS" : vExeStation = "1700"
-                            Case "EXS" : vExeStation = "1900"
-                            Case "CFG" : vExeStation = "1950"
-                        End Select
-
-                    Case "CFP2"
-                        Select Case vProcess
-                            Case "OBS" : vExeStation = "101"
-                            Case "FVT" : vExeStation = "150"
-                            Case "EPT" : vExeStation = "160"
-                            Case "ESS" : vExeStation = "170"
-                            Case "FST" : vExeStation = "180"
-                            Case "CFG" : vExeStation = "200"
-                        End Select
-
-                    Case "AC400"
-                        Select Case vProcess
-                            Case "OBS" : vExeStation = "190"
-                            Case "FVT" : vExeStation = "250"
-                            Case "EPT" : vExeStation = "260"
-                            Case "ESS" : vExeStation = "270"
-                            Case "FST" : vExeStation = "280"
-                            Case "EXS" : vExeStation = "290"
-                            Case "CFG" : vExeStation = "325"
-                        End Select
-
-                    Case "AC400 [NON ETOF]"
-                        Select Case vProcess
-                            Case "OBS" : vExeStation = "190"
-                            Case "FVT" : vExeStation = "250"
-                            Case "EPT" : vExeStation = "260"
-                            Case "ESS" : vExeStation = "270"
-                            Case "FST" : vExeStation = "280"
-                            Case "EXS" : vExeStation = "290"
-                            Case "CFG" : vExeStation = "325"
-                        End Select
-                End Select
-
-
-                vHandShake = objFITSDLL.fn_Handshake(vModel, vExeStation, "2.9", vSn)
-                If vHandShake <> "True" And Not vHandShake.Contains("in-processing in " & vExeStation) Then
-                    WrongRoutingLog(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vUutID & "--" & vHandShake)
-                    GoTo nextSN
-                End If
-
-
-
-
-                Dim vuutStatus As String = rs.Fields("uut_status").Value
-                Dim vLoginName As String = rs.Fields("user_login_name").Value
-                Dim vProductCode As String = rs.Fields("product_code").Value
-                Dim vFixtureID As String = rs.Fields("Fixture_ID").Value
-                Dim vStationID As String = rs.Fields("Station_ID").Value
-                Dim vDateTime As String = rs.Fields("start_date_time").Value
-                Dim vExeTime As String = rs.Fields("execution_time").Value
-                Dim vMode As String = rs.Fields("Mode").Value
-                Dim vTestCount As String = rs.Fields("test_count").Value
-                Dim vTestSocketIndex As String = rs.Fields("TEST_SOCKET_INDEX").Value
-                Dim vTpsRev As String = rs.Fields("TPS_REV").Value
-                Dim vHWRev As String = rs.Fields("HW_REV").Value
-                Dim vFWRev As String = rs.Fields("FW_REV").Value
-                Dim vResult As String = rs.Fields("uut_status").Value
-                Dim vHWPart As String = rs.Fields("HW_PART_NUMBER").Value
-                Dim vRemark As String = ""
-                Dim vTopBomRev As String = ""
-                Dim vDisposCode As String = ""
-
-
-                vTopBomRev = objFITSDLL.fn_Query(vModel, vExeStation, "2.9", vSn, "PART_REV", ",")
-
-                If vResult = "Terminated" Then
-                    'Keep Terminated ID
-                    'vRemark = getTerminatedText(vSn, vProcess, vUutID)
-                    'vDisposCode = "Terminated"
-                    TerminatedLog(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vUutID)
-                    GoTo nextSN
-                End If
-
-                If vResult = "Failed" Then
-                    vRemark = getFailedText(vSn, vProcess, vUutID)
-                    If vRemark.Length > 0 Then
-                        vDisposCode = vRemark.Split("=")(0).ToUpper
+                    If vProcess = "EBT" Then
+                        With objFITSDLL
+                            vInitResult = .fn_InitDB("*", "", "2.9", "dbSMT_BU")
+                        End With
+                        vExeStation = "3261"
+                        vModel = objFITSDLL.fn_Query("", vExeStation, "2.9", vSn, "Part_Number")
                     Else
-                        'Terminated.
-                        TerminatedLog(Now() & "--" & vSn & "," & vModel & "," & vProcess & "," & vUutID)
-                        GoTo nextSN
-                        'vRemark = "Not Found failed record" 'getTerminatedText(vSn, vProcess, vUutID)
-                        'vDisposCode = "Terminated"
-                    End If
-                End If
+                        With objFITSDLL
+                            vInitResult = .fn_InitDB("*", "", "2.9", "dbAcacia")
+                        End With
+                        vModelType = objFits.getEventMaster(vSn, "model_type")
+                        vModel = objFits.getEventMaster(vSn, "model")
 
-                'Add by Chutchai on Dec 13,2016 
-                'To put EN number into FIT by mapping from setting.
+                        vHWPartFIT = objFits.getParameters(vSn, "10112")
+                        vModel = vModelType
+
+                        vDeviceTypeFit = objFits.getParameters(vSn, "1204")
+                        vDeviceTypeATS = objAutoTest.getDeviceType(vSn, "DCP")
+
+                        vDeviceTypeCheck = IIf(vDeviceTypeATS = vDeviceTypeFit, True, False)
+                    End If
+
+
+                    'vModel = objFITS.fn_Query(txtModel.Text, vKittingStation, "1", rs.Fields(""), "Model")
+                    Select Case vModel.ToUpper
+                        Case "ACADIA"
+                            Select Case vProcess
+                                Case "DCP" : vExeStation = "180"
+                                Case "DBI" : vExeStation = "190"
+                                Case "FTU" : vExeStation = "230"
+                                Case "FPT" : vExeStation = "290"
+                                Case "FAT" : vExeStation = "292"
+                            End Select
+
+                        Case "GLACIER"
+                            Select Case vProcess
+                                Case "DCP" : vExeStation = "118"
+                                Case "DBI" : vExeStation = "120"
+                                Case "FTU" : vExeStation = "126"
+                                Case "FPT" : vExeStation = "144"
+                                Case "FAT" : vExeStation = "146"
+                            End Select
+
+                        Case "SFF[ORION]"
+                            Select Case vProcess
+                                Case "DCP" : vExeStation = "116"
+                                Case "DBI" : vExeStation = "118"
+                                Case "FTU" : vExeStation = "128"
+                                Case "FAT" : vExeStation = "147"
+                            End Select
+
+
+                            'Module Level
+                        Case "CFP"
+                            Select Case vProcess
+                                Case "OBS" : vExeStation = "1400"
+                                Case "FVT" : vExeStation = "1600"
+                                Case "EPT" : vExeStation = "1650"
+                                Case "ESS" : vExeStation = "1700"
+                                Case "EXS" : vExeStation = "1900"
+                                Case "CFG" : vExeStation = "1950"
+                            End Select
+                        Case "CFP GLACIER"
+                            Select Case vProcess
+                                Case "OBS" : vExeStation = "1400"
+                                Case "FVT" : vExeStation = "1600"
+                                Case "EPT" : vExeStation = "1650"
+                                Case "ESS" : vExeStation = "1700"
+                                Case "EXS" : vExeStation = "1900"
+                                Case "CFG" : vExeStation = "1950"
+                            End Select
+
+                        Case "CFP2"
+                            Select Case vProcess
+                                Case "OBS" : vExeStation = "101"
+                                Case "FVT" : vExeStation = "150"
+                                Case "EPT" : vExeStation = "160"
+                                Case "ESS" : vExeStation = "170"
+                                Case "FST" : vExeStation = "180"
+                                Case "CFG" : vExeStation = "200"
+                            End Select
+
+                        Case "AC400"
+                            Select Case vProcess
+                                Case "OBS" : vExeStation = "190"
+                                Case "FVT" : vExeStation = "250"
+                                Case "EPT" : vExeStation = "260"
+                                Case "ESS" : vExeStation = "270"
+                                Case "FST" : vExeStation = "280"
+                                Case "EXS" : vExeStation = "290"
+                                Case "CFG" : vExeStation = "325"
+                            End Select
+
+                        Case "AC400 [NON ETOF]"
+                            Select Case vProcess
+                                Case "OBS" : vExeStation = "190"
+                                Case "FVT" : vExeStation = "250"
+                                Case "EPT" : vExeStation = "260"
+                                Case "ESS" : vExeStation = "270"
+                                Case "FST" : vExeStation = "280"
+                                Case "EXS" : vExeStation = "290"
+                                Case "CFG" : vExeStation = "325"
+                            End Select
+                    End Select
+
+
+                    vHandShake = objFITSDLL.fn_Handshake(vModel, vExeStation, "2.9", vSn)
+                    If vHandShake <> "True" And Not vHandShake.Contains("in-processing in " & vExeStation) Then
+                        WrongRoutingLog(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vUutID & "--" & vHandShake)
+                        GoTo nextSN
+                    End If
+
+
+
+
+                    Dim vuutStatus As String = rs.Fields("uut_status").Value
+                    Dim vLoginName As String = rs.Fields("user_login_name").Value
+                    Dim vProductCode As String = rs.Fields("product_code").Value
+                    Dim vFixtureID As String = rs.Fields("Fixture_ID").Value
+                    Dim vStationID As String = rs.Fields("Station_ID").Value
+                    Dim vDateTime As String = rs.Fields("start_date_time").Value
+                    Dim vExeTime As String = rs.Fields("execution_time").Value
+                    Dim vMode As String = rs.Fields("Mode").Value
+                    Dim vTestCount As String = rs.Fields("test_count").Value
+                    Dim vTestSocketIndex As String = rs.Fields("TEST_SOCKET_INDEX").Value
+                    Dim vTpsRev As String = rs.Fields("TPS_REV").Value
+                    Dim vHWRev As String = rs.Fields("HW_REV").Value
+                    Dim vFWRev As String = rs.Fields("FW_REV").Value
+                    Dim vResult As String = rs.Fields("uut_status").Value
+                    Dim vHWPart As String = rs.Fields("HW_PART_NUMBER").Value
+                    Dim vRemark As String = ""
+                    Dim vTopBomRev As String = ""
+                    Dim vDisposCode As String = ""
+
+
+                    vTopBomRev = objFITSDLL.fn_Query(vModel, vExeStation, "2.9", vSn, "PART_REV", ",")
+
+                    If vResult = "Terminated" Then
+                        'Keep Terminated ID
+                        'vRemark = getTerminatedText(vSn, vProcess, vUutID)
+                        'vDisposCode = "Terminated"
+                        TerminatedLog(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vUutID)
+                        GoTo nextSN
+                    End If
+
+                    If vResult = "Failed" Then
+                        vRemark = getFailedText(vSn, vProcess, vUutID)
+                        If vRemark.Length > 0 Then
+                            vDisposCode = vRemark.Split("=")(0).ToUpper
+                        Else
+                            'Terminated.
+                            TerminatedLog(Now() & "--" & vSn & "," & vModel & "," & vProcess & "," & vUutID)
+                            GoTo nextSN
+                            'vRemark = "Not Found failed record" 'getTerminatedText(vSn, vProcess, vUutID)
+                            'vDisposCode = "Terminated"
+                        End If
+                    End If
+
+                    'Add by Chutchai on Dec 13,2016 
+                    'To put EN number into FIT by mapping from setting.
                     Dim vEn As String
                     If vLoginName <> "" Then
                         vEn = objInI.GetString("operator", vLoginName, "000000")
@@ -320,20 +320,20 @@ Public Class Form1
                     If vProcess = "CFG" Then
                         vCustomer = objAutoTest.getCustomerString(vSn, vProcess, vUutID)
                     End If
-                '------------------------------------------------------------
-                Dim vTest1 As String
-                Dim vTest2 As String
-                If vProcess = "EBT" Then
-                    vTest1 = "PCBA S/N|Login Name|Product Code|Fixture ID|" & _
-                        "Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
-                        "TEST_SOCKET_INDEX|TPS_REV|HW_REV|EBT Result|FAIL MODE"
+                    '------------------------------------------------------------
+                    Dim vTest1 As String
+                    Dim vTest2 As String
+                    If vProcess = "EBT" Then
+                        vTest1 = "PCBA S/N|Login Name|Product Code|Fixture ID|" & _
+                            "Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
+                            "TEST_SOCKET_INDEX|TPS_REV|HW_REV|EBT Result|FAIL MODE"
 
-                    vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
-                                    vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
-                                    vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & IIf(vResult = "Passed", "PASS", "FAIL") & "|" & _
-                                    vDisposCode
+                        vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
+                                        vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
+                                        vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & IIf(vResult = "Passed", "PASS", "FAIL") & "|" & _
+                                        vDisposCode
 
-                Else
+                    Else
                         vTest1 = "FBN Serial No|Login Name|Product Code|" & _
                                            "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
                                            "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV.|" & _
@@ -344,43 +344,43 @@ Public Class Form1
                                         vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
                                         Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
                                         vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn & "|" & vCustomer
-                End If
+                    End If
 
-                Dim vCheckIn As String
-                Dim vCheckOut As String
-                vLastID = vUutID
-                Select Case vHandShake
-                    Case "True"
-                        'Need both check in and Out
-                        vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "0", "FBN Serial No", vSn)
-                        vCheckOut = objFITSDLL.fn_Log(vModel, vExeStation, "1", vTest1, vTest2, "|")
+                    Dim vCheckIn As String
+                    Dim vCheckOut As String
+                    vLastID = vUutID
+                    Select Case vHandShake
+                        Case "True"
+                            'Need both check in and Out
+                            vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "0", "FBN Serial No", vSn)
+                            vCheckOut = objFITSDLL.fn_Log(vModel, vExeStation, "1", vTest1, vTest2, "|")
 
-                        'vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "5", "FBN Serial No", vSn) 'Checkout Delete
-                        'vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "6", "FBN Serial No", vSn) 'Checkin Delete 
+                            'vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "5", "FBN Serial No", vSn) 'Checkout Delete
+                            'vCheckIn = objFITSDLL.fn_Log(vModel, vExeStation, "6", "FBN Serial No", vSn) 'Checkin Delete 
 
 
-                        Log(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vExeStation & "--" & vLastID & "--" & vCheckOut & "--" & IIf(vResult = "Passed", "PASS", vDisposCode))
-                    Case vHandShake.Contains("in-processing in " & vExeStation)
-                        'already check-in,Need only Check-out
-                        vCheckOut = objFITSDLL.fn_Log(vModel, vExeStation, "1", vTest1, vTest2, "|")
-                        Log(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vExeStation & "--" & vLastID & "--" & vCheckOut & "--" & IIf(vResult = "Passed", "PASS", vDisposCode))
-                    Case Else
-                        GoTo nextSN
-                End Select
-                '---------
-                '2)=========Check In =========================
+                            Log(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vExeStation & "--" & vLastID & "--" & vCheckOut & "--" & IIf(vResult = "Passed", "PASS", vDisposCode))
+                        Case vHandShake.Contains("in-processing in " & vExeStation)
+                            'already check-in,Need only Check-out
+                            vCheckOut = objFITSDLL.fn_Log(vModel, vExeStation, "1", vTest1, vTest2, "|")
+                            Log(Now() & "--" & vSn & "--" & vModel & "--" & vProcess & "--" & vExeStation & "--" & vLastID & "--" & vCheckOut & "--" & IIf(vResult = "Passed", "PASS", vDisposCode))
+                        Case Else
+                            GoTo nextSN
+                    End Select
+                    '---------
+                    '2)=========Check In =========================
 
-                .datetimeout = vTempTimeOut
+                    .datetimeout = vTempTimeOut
 
 nextSN:
 
-                lblLastDate.Text = .datetimeout : Application.DoEvents()
-                '---save last date to INI file---
-                objInI.WriteString("Last execution", "id", vLastID)
-                objInI.WriteString("Last execution", "date", .datetimeout)
-                '--------------------------------
-                rs.MoveNext()
-            Loop
+                    lblLastDate.Text = .datetimeout : Application.DoEvents()
+                    '---save last date to INI file---
+                    objInI.WriteString("Last execution", "id", vLastID)
+                    objInI.WriteString("Last execution", "date", .datetimeout)
+                    '--------------------------------
+                    rs.MoveNext()
+                Loop
         End With
 NoSN:
         '---Update From/To date
