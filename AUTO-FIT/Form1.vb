@@ -278,6 +278,7 @@ Public Class Form1
                     Dim vTpsRev As String = rs.Fields("TPS_REV").Value
                     Dim vHWRev As String = rs.Fields("HW_REV").Value
                     Dim vFWRev As String = rs.Fields("FW_REV").Value
+                    Dim vSWRev As String = rs.Fields("SW_REV").Value
                     Dim vResult As String = rs.Fields("uut_status").Value
                     Dim vHWPart As String = rs.Fields("HW_PART_NUMBER").Value
                     Dim vRemark As String = ""
@@ -324,26 +325,26 @@ Public Class Form1
                     Dim vTest1 As String
                     Dim vTest2 As String
                     If vProcess = "EBT" Then
-                        vTest1 = "PCBA S/N|Login Name|Product Code|Fixture ID|" & _
+                        vTest1 = "PCBA S/N|Login Name|Product Code|Product_Code|Fixture ID|" & _
                             "Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
-                            "TEST_SOCKET_INDEX|TPS_REV|HW_REV|EBT Result|FAIL MODE"
+                            "TEST_SOCKET_INDEX|TPS_REV|HW_REV|EBT Result|FAIL MODE|SW_REV"
 
-                        vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
+                        vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & vProductCode & "|" & _
                                         vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
                                         vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & IIf(vResult = "Passed", "PASS", "FAIL") & "|" & _
-                                        vDisposCode
+                                        vDisposCode & "|" & vSWRev
 
                     Else
-                        vTest1 = "FBN Serial No|Login Name|Product Code|" & _
+                        vTest1 = "FBN Serial No|Login Name|Product Code|Product_Code|" & _
                                            "Fixture ID|Station ID|Date/Time|Execute Time|Mode|TEST_COUNT|" & _
                                            "TEST_SOCKET_INDEX|TPS_REV|HW_REV|FW_REV|Result|Remark|TOP BOM REV.|" & _
-                                           "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)|EN|Customer"
+                                           "HW_PART_NUMBER  (FITS)|HW_PART_NUMBER|Device Type (FITS)|Device Type (ATS)|EN|Customer|SW_REV"
 
-                        vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & _
+                        vTest2 = vSn & "|" & vLoginName & "|" & vProductCode & "|" & vProductCode & "|" & _
                                         vFixtureID & "|" & vStationID & "|" & vDateTime & "|" & vExeTime & "|" & vMode & "|" & vTestCount & "|" & _
                                         vTestSocketIndex & "|" & vTpsRev & "|" & vHWRev & "|" & vFWRev & "|" & IIf(vResult = "Passed", "PASS", vDisposCode) & "|" & _
                                         Mid(vRemark, 1, 200) & "|" & vTopBomRev & "|" & _
-                                        vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn & "|" & vCustomer
+                                        vHWPartFIT & "|" & vHWPart & "|" & vDeviceTypeFit & "|" & vDeviceTypeATS & "|" & vEn & "|" & vCustomer & "|" & vSWRev
                     End If
 
                     Dim vCheckIn As String
